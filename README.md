@@ -4,11 +4,11 @@ Trade perpetual futures on [GRVT](https://grvt.io) — a hybrid decentralized de
 
 **One package, three interfaces:**
 
-| Interface | Command | Use Case |
-|-----------|---------|----------|
-| **CLI** | `grvt-cli` | Terminal trading, scripting, automation |
-| **MCP Server** | `grvt-mcp` | AI agents (Claude, Cursor, Windsurf, etc.) |
-| **OpenClaw Skill** | [`skill/SKILL.md`](skill/SKILL.md) | AI agent ecosystem (OpenClaw, ClawdBot) |
+| Interface          | Command                            | Use Case                                   |
+| ------------------ | ---------------------------------- | ------------------------------------------ |
+| **CLI**            | `grvt-cli`                         | Terminal trading, scripting, automation    |
+| **MCP Server**     | `grvt-mcp`                         | AI agents (Claude, Cursor, Windsurf, etc.) |
+| **OpenClaw Skill** | [`skill/SKILL.md`](skill/SKILL.md) | AI agent ecosystem (OpenClaw, ClawdBot)    |
 
 90+ perpetual instruments: crypto (BTC, ETH, SOL), equities (TSLA, AMZN), commodities (XAU, XAG).
 
@@ -56,11 +56,11 @@ grvt-cli config init
 
 Prompts for:
 
-| Prompt | Description | Where to find it |
-|---|---|---|
-| **API Key** | Your GRVT API key | Dashboard > Settings > API Keys |
-| **API Secret** | Private key for EIP-712 signing | Shown once when creating API key |
-| **Sub-account ID** | Numeric sub-account ID | Dashboard > Sub-accounts |
+| Prompt             | Description                     | Where to find it                 |
+| ------------------ | ------------------------------- | -------------------------------- |
+| **API Key**        | Your GRVT API key               | Dashboard > Settings > API Keys  |
+| **API Secret**     | Private key for EIP-712 signing | Shown once when creating API key |
+| **Sub-account ID** | Numeric sub-account ID          | Dashboard > Sub-accounts         |
 
 **Manual setup:**
 
@@ -109,17 +109,17 @@ grvt-cli order history --limit 50                  # Order history
 
 **Order options:**
 
-| Option | Required | Description | Default |
-|---|---|---|---|
-| `--instrument` | Yes | e.g., `BTC_USDT_Perp` | — |
-| `--side` | Yes | `buy` or `sell` | — |
-| `--size` | Yes | Size in base currency | — |
-| `--type` | No | `limit` or `market` | `limit` |
-| `--price` | Limit only | Limit price | — |
-| `--post-only` | No | Maker-only | `false` |
-| `--reduce-only` | No | Reduce-only | `false` |
-| `--time-in-force` | No | `GOOD_TILL_TIME`, `IMMEDIATE_OR_CANCEL`, `FILL_OR_KILL` | `GOOD_TILL_TIME` |
-| `--client-order-id` | No | Custom tracking ID | auto |
+| Option              | Required   | Description                                             | Default          |
+| ------------------- | ---------- | ------------------------------------------------------- | ---------------- |
+| `--instrument`      | Yes        | e.g., `BTC_USDT_Perp`                                   | —                |
+| `--side`            | Yes        | `buy` or `sell`                                         | —                |
+| `--size`            | Yes        | Size in base currency                                   | —                |
+| `--type`            | No         | `limit` or `market`                                     | `limit`          |
+| `--price`           | Limit only | Limit price                                             | —                |
+| `--post-only`       | No         | Maker-only                                              | `false`          |
+| `--reduce-only`     | No         | Reduce-only                                             | `false`          |
+| `--time-in-force`   | No         | `GOOD_TILL_TIME`, `IMMEDIATE_OR_CANCEL`, `FILL_OR_KILL` | `GOOD_TILL_TIME` |
+| `--client-order-id` | No         | Custom tracking ID                                      | auto             |
 
 #### Positions, Account & Funding
 
@@ -197,14 +197,14 @@ Or without global install:
 
 ### Available Tools (17)
 
-| Category | Tools | Auth Required |
-|----------|-------|---------------|
-| **Market Data** | `get_instruments`, `get_ticker`, `get_orderbook` | No |
-| **Orders** | `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history` | Yes |
-| **Positions** | `list_positions` | Yes |
-| **Account** | `get_account_summary`, `get_sub_account_summary` | Yes |
-| **Funding** | `get_funding_rate`, `get_funding_payment_history` | Mixed |
-| **Auth** | `auth_login`, `auth_status`, `auth_logout` | No |
+| Category        | Tools                                                                                                     | Auth Required |
+| --------------- | --------------------------------------------------------------------------------------------------------- | ------------- |
+| **Market Data** | `get_instruments`, `get_ticker`, `get_orderbook`                                                          | No            |
+| **Orders**      | `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history` | Yes           |
+| **Positions**   | `list_positions`                                                                                          | Yes           |
+| **Account**     | `get_account_summary`, `get_sub_account_summary`                                                          | Yes           |
+| **Funding**     | `get_funding_rate`, `get_funding_payment_history`                                                         | Mixed         |
+| **Auth**        | `auth_login`, `auth_status`, `auth_logout`                                                                | No            |
 
 Once configured, your AI agent can directly query prices, place orders, manage positions, and monitor your account on GRVT.
 
@@ -233,13 +233,13 @@ Compatible with OpenClaw, ClawdBot, and other agent skill platforms.
 
 Instruments follow `{BASE}_{QUOTE}_{Type}`:
 
-| Instrument | Description |
-|---|---|
-| `BTC_USDT_Perp` | Bitcoin perpetual |
-| `ETH_USDT_Perp` | Ethereum perpetual |
-| `SOL_USDT_Perp` | Solana perpetual |
+| Instrument       | Description            |
+| ---------------- | ---------------------- |
+| `BTC_USDT_Perp`  | Bitcoin perpetual      |
+| `ETH_USDT_Perp`  | Ethereum perpetual     |
+| `SOL_USDT_Perp`  | Solana perpetual       |
 | `TSLA_USDT_Perp` | Tesla equity perpetual |
-| `XAU_USDT_Perp` | Gold perpetual |
+| `XAU_USDT_Perp`  | Gold perpetual         |
 
 Use `grvt-cli market instruments -o json` for the full list with tick sizes and minimum order sizes.
 
@@ -299,12 +299,12 @@ To fix this, run:
   grvt-cli auth login
 ```
 
-| Error | Recovery |
-|---|---|
-| `Not authenticated` | `grvt-cli auth login` |
-| `API key is not configured` | `grvt-cli config init` |
-| `Order below minimum notional` | Increase `--size` or `--price` |
-| `Instrument not found` | `grvt-cli market instruments --kind PERPETUAL` |
+| Error                          | Recovery                                       |
+| ------------------------------ | ---------------------------------------------- |
+| `Not authenticated`            | `grvt-cli auth login`                          |
+| `API key is not configured`    | `grvt-cli config init`                         |
+| `Order below minimum notional` | Increase `--size` or `--price`                 |
+| `Instrument not found`         | `grvt-cli market instruments --kind PERPETUAL` |
 
 ## Safety Rules
 
@@ -326,20 +326,20 @@ To fix this, run:
 
 ## Configuration Files
 
-| File | Path | Description |
-|---|---|---|
-| Config | `~/.grvt-cli/config.json` | API key, secret, sub-account ID |
-| Session | `~/.grvt-cli/session.json` | Login session (auto-managed) |
+| File    | Path                       | Description                     |
+| ------- | -------------------------- | ------------------------------- |
+| Config  | `~/.grvt-cli/config.json`  | API key, secret, sub-account ID |
+| Session | `~/.grvt-cli/session.json` | Login session (auto-managed)    |
 
 Both files use `0600` permissions (owner read/write only). Sessions auto-refresh when needed.
 
 ## Environment Variables
 
-| Variable | Description |
-|---|---|
-| `GRVT_API_KEY` | API key (fallback when config not set) |
-| `GRVT_SECRET_KEY` | API secret / private key |
-| `GRVT_SUB_ACCOUNT_ID` | Default sub-account ID |
+| Variable              | Description                            |
+| --------------------- | -------------------------------------- |
+| `GRVT_API_KEY`        | API key (fallback when config not set) |
+| `GRVT_SECRET_KEY`     | API secret / private key               |
+| `GRVT_SUB_ACCOUNT_ID` | Default sub-account ID                 |
 
 ## Resources
 
@@ -347,7 +347,3 @@ Both files use `0600` permissions (owner read/write only). Sessions auto-refresh
 - **npm Package**: https://www.npmjs.com/package/@2oolkit/grvt-cli
 - **GitHub**: https://github.com/haeminmoon/grvt-cli
 - **GRVT API Docs**: https://docs.grvt.io/api
-
-## License
-
-MIT
