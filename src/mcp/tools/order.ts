@@ -11,11 +11,11 @@ export function registerOrderTools(server: McpServer): void {
     'create_order',
     'Place a new order on GRVT. Supports limit and market orders with optional post-only and reduce-only flags. Always check instrument specs (min size, tick size) before placing orders. Use reduce-only for closing positions.',
     {
-      instrument: z.string().describe('Instrument name (e.g., BTC_USDT_Perp)'),
+      instrument: z.string().regex(/^[A-Za-z0-9_]+$/, 'Invalid instrument name format').describe('Instrument name (e.g., BTC_USDT_Perp)'),
       side: z.enum(['buy', 'sell']).describe('Order side'),
-      size: z.string().describe('Order size in base currency (e.g., "0.01" for 0.01 BTC)'),
+      size: z.string().regex(/^\d+(\.\d+)?$/, 'Size must be a positive decimal number').describe('Order size in base currency (e.g., "0.01" for 0.01 BTC)'),
       type: z.enum(['limit', 'market']).default('limit').describe('Order type'),
-      price: z.string().optional().describe('Limit price (required for limit orders)'),
+      price: z.string().regex(/^\d+(\.\d+)?$/, 'Price must be a positive decimal number').optional().describe('Limit price (required for limit orders)'),
       reduce_only: z.boolean().default(false).describe('If true, order can only reduce an existing position'),
       post_only: z.boolean().default(false).describe('If true, order is rejected if it would fill immediately (guarantees maker fee)'),
       time_in_force: z.enum(['GOOD_TILL_TIME', 'IMMEDIATE_OR_CANCEL', 'FILL_OR_KILL']).default('GOOD_TILL_TIME').describe('Time in force policy'),
@@ -85,7 +85,7 @@ export function registerOrderTools(server: McpServer): void {
     'cancel_order',
     'Cancel a specific open order by order ID.',
     {
-      order_id: z.string().describe('Order ID to cancel (hex string starting with 0x)'),
+      order_id: z.string().regex(/^0x[a-fA-F0-9]+$/, 'Order ID must be a hex string starting with 0x').describe('Order ID to cancel (hex string starting with 0x)'),
     },
     async (params) => withErrorHandling(async () => {
       const auth = createAuthClient();
@@ -131,7 +131,7 @@ export function registerOrderTools(server: McpServer): void {
     'get_order',
     'Get details of a specific order by order ID, including status, fill information, and timestamps.',
     {
-      order_id: z.string().describe('Order ID (hex string starting with 0x)'),
+      order_id: z.string().regex(/^0x[a-fA-F0-9]+$/, 'Order ID must be a hex string starting with 0x').describe('Order ID (hex string starting with 0x)'),
     },
     async (params) => withErrorHandling(async () => {
       const auth = createAuthClient();

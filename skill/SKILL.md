@@ -16,7 +16,7 @@ compatibility: >-
   Network access to grvt.io required.
 metadata:
   author: 2oolkit
-  version: "0.1.1"
+  version: "0.1.2"
   exchange: grvt
   openclaw:
     emoji: "📈"

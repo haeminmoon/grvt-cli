@@ -19,21 +19,23 @@ export function handleError(err: unknown): never {
   } else if (err instanceof Error) {
     process.stderr.write(`ERROR: ${err.message}\n`);
 
-    // Show Axios response data if available
+    // Show sanitized Axios response data (only code + message fields)
     const axiosErr = err as any;
     if (axiosErr.response?.data) {
       const raw = axiosErr.response.data;
-      let detail: string;
-      if (typeof raw === 'string') {
-        try {
-          detail = JSON.stringify(JSON.parse(raw), null, 2);
-        } catch {
-          detail = raw;
+      const parsed = typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : raw;
+      if (parsed && typeof parsed === 'object') {
+        const safe: Record<string, unknown> = {};
+        if (parsed.code !== undefined) safe.code = parsed.code;
+        if (parsed.message !== undefined) safe.message = parsed.message;
+        if (parsed.error !== undefined) safe.error = parsed.error;
+        if (Object.keys(safe).length > 0) {
+          process.stderr.write(`DETAIL:\n${JSON.stringify(safe, null, 2)}\n`);
         }
-      } else {
-        detail = JSON.stringify(raw, null, 2);
+      } else if (typeof raw === 'string') {
+        // Plain string error — truncate to prevent excessive output
+        process.stderr.write(`DETAIL:\n${raw.slice(0, 500)}\n`);
       }
-      process.stderr.write(`DETAIL:\n${detail}\n`);
     }
 
     if (err.message.includes('api_key') || err.message.includes('401') || err.message.includes('Unauthorized')) {

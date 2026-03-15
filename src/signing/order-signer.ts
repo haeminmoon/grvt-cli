@@ -1,7 +1,16 @@
+import * as crypto from 'crypto';
 import { Signer } from '@grvt/sdk/signing/signer';
 import { getEIP712DomainData } from '@grvt/sdk/signing/domain';
-import { Order as OrderType, GenerateNonce, GenerateExpiration, EGrvtEnvironment } from '@grvt/sdk';
+import { Order as OrderType, GenerateExpiration, EGrvtEnvironment } from '@grvt/sdk';
 import { ethers } from 'ethers';
+
+/**
+ * Cryptographically secure nonce generator.
+ * Replaces SDK's GenerateNonce() which uses Math.random() (predictable PRNG).
+ */
+function generateSecureNonce(): number {
+  return crypto.randomInt(0, 2 ** 32);
+}
 
 // TimeInForce enum values (matching GRVT's ETimeInForceInt)
 const TIME_IN_FORCE_MAP: Record<string, number> = {
@@ -14,12 +23,19 @@ const TIME_IN_FORCE_MAP: Record<string, number> = {
 /**
  * Multiply a decimal string by 10^decimals and return as number.
  * E.g., toScaledInt("0.01", 9) => 10000000
+ * Throws if result exceeds Number.MAX_SAFE_INTEGER to prevent silent precision loss.
  */
 function toScaledInt(value: string, decimals: number): number {
   const parts = value.split('.');
   const intPart = parts[0] || '0';
   const decPart = (parts[1] || '').padEnd(decimals, '0').slice(0, decimals);
-  return Number(BigInt(intPart + decPart));
+  const result = BigInt(intPart + decPart);
+  if (result > BigInt(Number.MAX_SAFE_INTEGER)) {
+    throw new Error(
+      `Scaled value ${result} exceeds MAX_SAFE_INTEGER. The value "${value}" with ${decimals} decimals is too large to represent safely.`
+    );
+  }
+  return Number(result);
 }
 
 export interface InstrumentInfo {
@@ -78,7 +94,7 @@ export async function signOrder(
   env: EGrvtEnvironment,
 ): Promise<SignedOrder> {
   const domain = getEIP712DomainData(env);
-  const nonce = GenerateNonce();
+  const nonce = generateSecureNonce();
   const expiration = GenerateExpiration(28 * 24); // 28 days
 
   const timeInForceValue = TIME_IN_FORCE_MAP[params.timeInForce] || 1;
@@ -129,7 +145,7 @@ export async function signOrder(
     legs: params.legs.map((leg) => ({
       instrument: leg.instrument,
       size: leg.size,
-      limit_price: String(parseInt(leg.limitPrice) || 0),
+      limit_price: leg.limitPrice || '0',
       is_buying_asset: leg.isBuyingAsset,
     })),
     signature: {
@@ -141,7 +157,7 @@ export async function signOrder(
       nonce,
     },
     metadata: {
-      client_order_id: `${Date.now().toString().slice(-10)}${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`,
+      client_order_id: `${Date.now().toString().slice(-10)}${crypto.randomInt(0, 1000000).toString().padStart(6, '0')}`,
     },
   };
 }

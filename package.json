@@ -1,6 +1,6 @@
 {
   "name": "@2oolkit/grvt-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "CLI & MCP server for GRVT derivatives exchange — trade perpetuals, manage orders, and query market data",
   "homepage": "https://github.com/haeminmoon/grvt-cli#readme",
   "bugs": {

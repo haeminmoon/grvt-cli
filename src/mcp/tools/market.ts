@@ -38,7 +38,7 @@ export function registerMarketTools(server: McpServer): void {
     'get_ticker',
     'Get real-time ticker data for a specific instrument including last price, mark price, index price, best bid/ask, 24h volume, funding rate, and open interest.',
     {
-      instrument: z.string().describe('Instrument name (e.g., BTC_USDT_Perp, ETH_USDT_Perp)'),
+      instrument: z.string().regex(/^[A-Za-z0-9_]+$/, 'Invalid instrument name format').describe('Instrument name (e.g., BTC_USDT_Perp, ETH_USDT_Perp)'),
     },
     async (params) => withErrorHandling(async () => {
       const client = createPublicClient();
@@ -51,7 +51,7 @@ export function registerMarketTools(server: McpServer): void {
     'get_orderbook',
     'Get the order book (bids and asks) for an instrument. Shows price levels, sizes, and number of orders at each level. Use to assess liquidity before placing large orders.',
     {
-      instrument: z.string().describe('Instrument name (e.g., BTC_USDT_Perp)'),
+      instrument: z.string().regex(/^[A-Za-z0-9_]+$/, 'Invalid instrument name format').describe('Instrument name (e.g., BTC_USDT_Perp)'),
       depth: z.number().min(1).max(20).default(10).describe('Number of price levels to return (1-20)'),
     },
     async (params) => withErrorHandling(async () => {

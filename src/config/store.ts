@@ -37,9 +37,7 @@ function getSessionPath(): string {
 
 function ensureConfigDir(): void {
   const dir = getConfigDir();
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { mode: 0o700, recursive: true });
-  }
+  fs.mkdirSync(dir, { mode: 0o700, recursive: true });
 }
 
 export function resolveEnv(input: string): EGrvtEnvironment {
@@ -58,9 +56,6 @@ export function resolveEnv(input: string): EGrvtEnvironment {
 
 export function loadConfig(): CliConfig {
   const configPath = getConfigPath();
-  if (!fs.existsSync(configPath)) {
-    return { env: DEFAULT_ENV };
-  }
   try {
     const raw = fs.readFileSync(configPath, 'utf-8');
     const data = JSON.parse(raw);
@@ -87,15 +82,14 @@ export function saveConfig(config: Partial<CliConfig>): void {
 
 export function loadSession(): SessionData | null {
   const sessionPath = getSessionPath();
-  if (!fs.existsSync(sessionPath)) {
-    return null;
-  }
   try {
     const raw = fs.readFileSync(sessionPath, 'utf-8');
     const data = JSON.parse(raw);
     if (data.expiresAt && Date.now() < data.expiresAt * 1000) {
       return data as SessionData;
     }
+    // Delete expired session file
+    try { fs.unlinkSync(sessionPath); } catch { /* ignore */ }
     return null;
   } catch {
     return null;
@@ -111,9 +105,10 @@ export function saveSession(session: SessionData): void {
 }
 
 export function clearSession(): void {
-  const sessionPath = getSessionPath();
-  if (fs.existsSync(sessionPath)) {
-    fs.unlinkSync(sessionPath);
+  try {
+    fs.unlinkSync(getSessionPath());
+  } catch {
+    /* ignore ENOENT — file already absent */
   }
 }
 

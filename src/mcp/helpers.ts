@@ -46,10 +46,19 @@ export async function withErrorHandling(fn: () => Promise<ReturnType<typeof mcpT
   } catch (err: unknown) {
     const axiosErr = err as any;
     if (axiosErr?.response?.data) {
-      const detail = typeof axiosErr.response.data === 'string'
-        ? axiosErr.response.data
-        : JSON.stringify(axiosErr.response.data, null, 2);
-      return mcpError(`${(err as Error).message}\n${detail}`);
+      const raw = axiosErr.response.data;
+      const parsed = typeof raw === 'string' ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : raw;
+      let detail: string;
+      if (parsed && typeof parsed === 'object') {
+        const safe: Record<string, unknown> = {};
+        if (parsed.code !== undefined) safe.code = parsed.code;
+        if (parsed.message !== undefined) safe.message = parsed.message;
+        if (parsed.error !== undefined) safe.error = parsed.error;
+        detail = Object.keys(safe).length > 0 ? JSON.stringify(safe, null, 2) : '';
+      } else {
+        detail = typeof raw === 'string' ? raw.slice(0, 500) : '';
+      }
+      return mcpError(detail ? `${(err as Error).message}\n${detail}` : (err as Error).message);
     }
     return mcpError(err instanceof Error ? err.message : String(err));
   }

@@ -9,6 +9,47 @@ function ask(rl: readline.Interface, question: string): Promise<string> {
   return new Promise((resolve) => rl.question(question, resolve));
 }
 
+/**
+ * Prompt for sensitive input with echo suppressed.
+ * Characters are replaced with '*' as the user types.
+ */
+function askSecret(question: string): Promise<string> {
+  return new Promise((resolve) => {
+    process.stdout.write(question);
+    const stdin = process.stdin;
+    const wasRaw = stdin.isRaw;
+    if (stdin.isTTY) stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding('utf-8');
+
+    let input = '';
+    const onData = (char: string) => {
+      const c = char.toString();
+      if (c === '\n' || c === '\r') {
+        stdin.removeListener('data', onData);
+        if (stdin.isTTY) stdin.setRawMode(wasRaw ?? false);
+        stdin.pause();
+        process.stdout.write('\n');
+        resolve(input);
+      } else if (c === '\u007F' || c === '\b') {
+        // Backspace
+        if (input.length > 0) {
+          input = input.slice(0, -1);
+          process.stdout.write('\b \b');
+        }
+      } else if (c === '\u0003') {
+        // Ctrl+C
+        process.stdout.write('\n');
+        process.exit(0);
+      } else {
+        input += c;
+        process.stdout.write('*');
+      }
+    };
+    stdin.on('data', onData);
+  });
+}
+
 export function registerConfigCommands(program: Command): void {
   const configCmd = program
     .command('config')
@@ -18,23 +59,27 @@ export function registerConfigCommands(program: Command): void {
     .command('init')
     .description('Interactive setup wizard')
     .action(async () => {
-      const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+      let activeRl: readline.Interface | null = null;
       try {
         process.stdout.write('\nGRVT CLI Setup\n\n');
 
         const env = resolveEnv('prod');
 
-        const apiKey = (await ask(rl, 'API Key: ')).trim();
+        activeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const apiKey = (await ask(activeRl, 'API Key: ')).trim();
         if (!apiKey) {
           throw new Error('API key is required.');
         }
+        activeRl.close();
+        activeRl = null;
 
-        const apiSecret = (await ask(rl, 'API Secret (private key): ')).trim();
+        const apiSecret = (await askSecret('API Secret (private key): ')).trim();
         if (!apiSecret) {
           throw new Error('API secret is required.');
         }
 
-        const subAccountId = (await ask(rl, 'Sub-account ID: ')).trim();
+        activeRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+        const subAccountId = (await ask(activeRl, 'Sub-account ID: ')).trim();
         if (!subAccountId) {
           throw new Error('Sub-account ID is required.');
         }
@@ -63,7 +108,7 @@ export function registerConfigCommands(program: Command): void {
       } catch (err) {
         handleError(err);
       } finally {
-        rl.close();
+        activeRl?.close();
       }
     });
 

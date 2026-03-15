@@ -9,7 +9,7 @@ export function registerFundingTools(server: McpServer): void {
     'get_funding_rate',
     'Get the current funding rate for a perpetual instrument. Shows funding rate, 8h average rate, mark price at funding time, and next settlement time. Positive rate means longs pay shorts; negative means shorts pay longs.',
     {
-      instrument: z.string().describe('Instrument name (e.g., BTC_USDT_Perp)'),
+      instrument: z.string().regex(/^[A-Za-z0-9_]+$/, 'Invalid instrument name format').describe('Instrument name (e.g., BTC_USDT_Perp)'),
     },
     async (params) => withErrorHandling(async () => {
       const client = createPublicClient();
@@ -29,7 +29,7 @@ export function registerFundingTools(server: McpServer): void {
     'get_funding_payment_history',
     'Get your funding payment history. Shows amounts received (positive) or paid (negative) per settlement period. Requires authentication.',
     {
-      instrument: z.string().optional().describe('Filter by instrument name'),
+      instrument: z.string().regex(/^[A-Za-z0-9_]+$/, 'Invalid instrument name format').optional().describe('Filter by instrument name'),
       limit: z.number().min(1).max(100).default(20).describe('Number of results to return'),
     },
     async (params) => withErrorHandling(async () => {

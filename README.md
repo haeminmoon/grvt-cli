@@ -315,6 +315,15 @@ To fix this, run:
 5. **Never expose API secret** — it's used locally for signing, never sent to servers
 6. **Use Trade-only API keys** — never use keys with withdrawal permissions
 
+## Security
+
+- **Secret input masking** — `config init` hides your API secret as you type (displays `*`)
+- **Cryptographic nonce** — order signing uses a CSPRNG (`crypto.randomInt`), not `Math.random()`
+- **File permissions** — config and session files are created with `0600` (owner read/write only)
+- **Input validation** — MCP tool inputs (instrument, size, price, order ID) are validated with regex patterns
+- **Error sanitization** — server error responses are filtered to prevent internal detail leakage
+- **Expired session cleanup** — expired session files are automatically deleted on detection
+
 ## Configuration Files
 
 | File | Path | Description |

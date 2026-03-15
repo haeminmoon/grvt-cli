@@ -311,38 +311,48 @@ API 엔드포인트 패턴:
 ## 7. 구현 순서 (Phase 1 MVP)
 
 ### Step 1: 프로젝트 셋업
-- [ ] package.json 설정 (dependencies, bin 필드)
-- [ ] tsconfig.json 설정
-- [ ] tsup.config.ts 설정
-- [ ] src/index.ts — Commander 기본 구조
+- [x] package.json 설정 (dependencies, bin 필드)
+- [x] tsconfig.json 설정
+- [x] tsup.config.ts 설정
+- [x] src/index.ts — Commander 기본 구조
 
 ### Step 2: 설정 관리
-- [ ] config/store.ts — ~/.grvt-cli/config.json 읽기/쓰기
-- [ ] config/constants.ts — 환경별 도메인, Chain ID
-- [ ] commands/config.ts — `config set`, `config get`, `config list`
+- [x] config/store.ts — ~/.grvt-cli/config.json 읽기/쓰기
+- [x] config/constants.ts — 환경별 도메인, Chain ID
+- [x] commands/config.ts — `config set`, `config get`, `config list`
 
 ### Step 3: 인증
-- [ ] client/api-client.ts — GrvtClient 래핑, 세션 관리
-- [ ] commands/auth.ts — `auth login`, `auth status`
+- [x] client/api-client.ts — GrvtClient 래핑, 세션 관리
+- [x] commands/auth.ts — `auth login`, `auth status`
 
 ### Step 4: 시장 데이터 (인증 불필요)
-- [ ] commands/market.ts — `market instruments`, `market ticker`, `market orderbook`
-- [ ] output/formatter.ts — JSON/Table 출력
+- [x] commands/market.ts — `market instruments`, `market ticker`, `market orderbook`
+- [x] output/formatter.ts — JSON/Table 출력
 
 ### Step 5: 주문 관리 (핵심)
-- [ ] signing/order-signer.ts — EIP-712 주문 서명
-- [ ] commands/order.ts — `order create`, `order cancel`, `order cancel-all`, `order get`, `order list`, `order history`
-- [ ] output/error.ts — 행동 유도형 에러
+- [x] signing/order-signer.ts — EIP-712 주문 서명
+- [x] commands/order.ts — `order create`, `order cancel`, `order cancel-all`, `order get`, `order list`, `order history`
+- [x] output/error.ts — 행동 유도형 에러
 
 ### Step 6: 포지션 및 계정
-- [ ] commands/position.ts — `position list`
-- [ ] commands/account.ts — `account summary`, `account sub-account`
-- [ ] commands/funding.ts — `funding rate`, `funding history`
+- [x] commands/position.ts — `position list`
+- [x] commands/account.ts — `account summary`, `account sub-account`
+- [x] commands/funding.ts — `funding rate`, `funding history`
 
 ### Step 7: 빌드 및 배포
-- [ ] tsup 번들링 설정
-- [ ] npm bin 필드 설정 (npx grvt-cli)
+- [x] tsup 번들링 설정
+- [x] npm bin 필드 설정 (npx grvt-cli)
 - [ ] 테스트넷 기반 E2E 테스트
+
+### Step 8: 보안 강화 (v0.1.2)
+- [x] CSPRNG nonce 생성 — SDK의 `Math.random()` 대신 `crypto.randomInt()` 사용
+- [x] `toScaledInt` 정밀도 보호 — `MAX_SAFE_INTEGER` 초과 시 에러 throw
+- [x] `limit_price` 소수점 절삭 방지 — `parseInt` 제거
+- [x] `config init` 시크릿 입력 마스킹 — raw mode + `*` 표시
+- [x] MCP 입력 검증 — instrument, size, price, order_id에 regex 적용
+- [x] TOCTOU race condition 제거 — `existsSync` → try-catch 패턴
+- [x] 만료 세션 파일 자동 삭제
+- [x] 에러 응답 필터링 — code/message/error 필드만 노출
 
 ---
 
