@@ -157,6 +157,9 @@ These commands work without login. Use them for price checks, instrument discove
 | `grvt-cli market ticker <instrument>` | Price, volume, funding rate, open interest |
 | `grvt-cli market orderbook <instrument>` | Orderbook with bids and asks (10 levels) |
 | `grvt-cli market orderbook <instrument> --depth 20` | 20 levels of depth |
+| `grvt-cli market candles <instrument>` | Candlestick / OHLCV data (up to 1000 1h bars per request) |
+| `grvt-cli market candles <instrument> -i 15m --type MARK` | Choose interval (1m–4w) and price type (TRADE/MARK/INDEX/MID) |
+| `grvt-cli market candles <instrument> --count 5000` | Fetch >1000 bars via auto-pagination |
 
 ### Trading (Authentication Required)
 
@@ -479,7 +482,7 @@ Both files are created with `0600` permissions (owner read/write only). Sessions
 For in-depth guides on specific topics:
 
 - **[references/trading.md](references/trading.md)** — Order types, time-in-force, position management, bracket orders, scaling strategies
-- **[references/market-data.md](references/market-data.md)** — Instrument discovery, ticker fields, orderbook analysis, funding rate strategies
+- **[references/market-data.md](references/market-data.md)** — Instrument discovery, ticker fields, orderbook analysis, candlestick/OHLCV pagination, funding rate strategies
 - **[references/authentication.md](references/authentication.md)** — Setup methods, session management, security best practices, credential rotation
 
 ## Troubleshooting
@@ -557,7 +560,7 @@ claude mcp add grvt-mcp -- grvt-mcp
 }
 ```
 
-The MCP server exposes 17 tools: `get_instruments`, `get_ticker`, `get_orderbook`, `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history`, `list_positions`, `get_account_summary`, `get_sub_account_summary`, `get_funding_rate`, `get_funding_payment_history`, `auth_login`, `auth_status`, `auth_logout`.
+The MCP server exposes 18 tools: `get_instruments`, `get_ticker`, `get_orderbook`, `get_candlesticks`, `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history`, `list_positions`, `get_account_summary`, `get_sub_account_summary`, `get_funding_rate`, `get_funding_payment_history`, `auth_login`, `auth_status`, `auth_logout`.
 
 Credentials are shared with the CLI — set up once with `grvt-cli config init`.
 

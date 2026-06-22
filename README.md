@@ -88,7 +88,28 @@ grvt-cli market instruments --base BTC             # Filter by base currency
 grvt-cli market ticker BTC_USDT_Perp               # Price, volume, funding
 grvt-cli market orderbook BTC_USDT_Perp            # Orderbook (10 levels)
 grvt-cli market orderbook BTC_USDT_Perp --depth 20 # 20 levels
+
+# Candlesticks / OHLCV
+grvt-cli market candles BTC_USDT_Perp                       # Last 1000 1h bars (max per request)
+grvt-cli market candles BTC_USDT_Perp -i 15m                # 15-minute bars
+grvt-cli market candles BTC_USDT_Perp -i 1h --type MARK     # Mark-price candles
+grvt-cli market candles BTC_USDT_Perp -i 1h --count 5000    # Auto-paginate to 5000 bars
+grvt-cli market candles BTC_USDT_Perp -i 1d --start 2025-01-01 -o json
 ```
+
+**Candlestick options (`market candles <instrument>`):**
+
+| Option            | Description                                                                    | Default  |
+| ----------------- | ------------------------------------------------------------------------------ | -------- |
+| `-i, --interval`  | `1m`, `3m`, `5m`, `15m`, `30m`, `1h`, `2h`, `4h`, `6h`, `8h`, `12h`, `1d`, `3d`, `5d`, `1w`, `2w`, `3w`, `4w` | `1h`     |
+| `--type`          | `TRADE`, `MARK`, `INDEX`, `MID`                                                | `TRADE`  |
+| `--start`         | Start time — ISO-8601 (e.g. `2025-01-01T00:00:00Z`) or epoch ms                | —        |
+| `--end`           | End time — ISO-8601 or epoch ms                                                | —        |
+| `--limit`         | Bars in a **single request** (max **1000**, clamped — no server error)         | `1000`   |
+| `--count`         | Total bars to fetch; **auto-paginates** beyond 1000 (no cap)                   | —        |
+| `-o, --output`    | `table` or `json`                                                              | `table`  |
+
+**Per-request max is 1000 bars.** Use `--limit` for a single request (values above 1000 are clamped locally). To fetch more, pass `--count <n>` — the CLI walks backward through history one page at a time, dedupes by open time, sorts ascending, and returns exactly `n` bars (or all available history if fewer exist).
 
 #### Orders (auth required)
 
@@ -195,11 +216,11 @@ Or without global install:
 }
 ```
 
-### Available Tools (17)
+### Available Tools (18)
 
 | Category        | Tools                                                                                                     | Auth Required |
 | --------------- | --------------------------------------------------------------------------------------------------------- | ------------- |
-| **Market Data** | `get_instruments`, `get_ticker`, `get_orderbook`                                                          | No            |
+| **Market Data** | `get_instruments`, `get_ticker`, `get_orderbook`, `get_candlesticks`                                      | No            |
 | **Orders**      | `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history` | Yes           |
 | **Positions**   | `list_positions`                                                                                          | Yes           |
 | **Account**     | `get_account_summary`, `get_sub_account_summary`                                                          | Yes           |

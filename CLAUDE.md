@@ -53,6 +53,7 @@ src/
 - **Output:** Table (human default) + JSON (`-o json` for agents/scripts). Errors go to stderr.
 - **Auth flow:** API key login → session cookie stored locally → auto-refresh on expiry.
 - **EIP-712 signing:** Orders are signed client-side with the user's private key (apiSecret). The key never leaves the machine.
+- **Candlestick pagination:** `market candles` / MCP `get_candlesticks` cap a single request at **1000 bars** (`--limit`, clamped locally — never leaks a server 400). For larger pulls, `--count <n>` auto-paginates by walking `end_time` backward (the kline `next` cursor only steps one bar without a window, so the helper rolls the window itself), deduping by `open_time` and sorting ascending. Shared logic lives in `src/utils/candles.ts` (interval/type maps, `toNanos`, `clampLimit`, `fetchAllCandles`) and is wired into both the CLI command and the MCP tool. Intervals: `1m,3m,5m,15m,30m,1h,2h,4h,6h,8h,12h,1d,3d,5d,1w,2w,3w,4w`; types: `TRADE,MARK,INDEX,MID`. Timestamps are nanoseconds.
 
 ## Commands & Scripts
 

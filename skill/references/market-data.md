@@ -120,6 +120,67 @@ grvt-cli market orderbook BTC_USDT_Perp -o json
 # Calculate: spread_bps = (spread / mid_price) * 10000
 ```
 
+## Candlesticks (OHLCV)
+
+Historical candlestick / OHLCV bars for charting, backtesting, and indicators.
+
+```bash
+# Last 1000 1h bars (1000 = max per request)
+grvt-cli market candles BTC_USDT_Perp -o json
+
+# Pick an interval and price type
+grvt-cli market candles BTC_USDT_Perp -i 15m -o json
+grvt-cli market candles BTC_USDT_Perp -i 1h --type MARK -o json
+
+# Bounded time range (ISO-8601 or epoch ms; converted to nanoseconds internally)
+grvt-cli market candles BTC_USDT_Perp -i 1d --start 2025-01-01 --end 2025-06-01 -o json
+
+# Fetch MORE than 1000 bars — auto-paginates
+grvt-cli market candles BTC_USDT_Perp -i 1h --count 5000 -o json
+```
+
+### Intervals
+
+`1m`, `3m`, `5m`, `15m`, `30m`, `1h` (default), `2h`, `4h`, `6h`, `8h`, `12h`, `1d`, `3d`, `5d`, `1w`, `2w`, `3w`, `4w`
+
+### Price Types (`--type`)
+
+| Type | Meaning |
+|------|---------|
+| `TRADE` | Last-trade prices (default) |
+| `MARK` | Mark-price candles (used for PnL / liquidation) |
+| `INDEX` | Index-price candles (external spot reference) |
+| `MID` | Mid-price (bid/ask midpoint) candles |
+
+### Per-Request Maximum & Pagination
+
+- **A single request returns at most 1000 bars.** The `--limit` flag is **clamped to 1000** locally — values above 1000 do not error, they are silently reduced (avoiding a raw server `400`).
+- **To fetch more than 1000 bars, use `--count <n>`** (no cap). The CLI auto-paginates by walking the time window backward (`end_time` set to just before the oldest bar of the previous page), deduplicates by `open_time`, sorts ascending, and returns exactly `n` bars — or all available history if fewer exist.
+
+```bash
+# One request, capped at 1000
+grvt-cli market candles BTC_USDT_Perp -i 1h --limit 1000 -o json | jq 'length'   # 1000
+
+# Auto-pagination: ~5 pages → 5000 bars
+grvt-cli market candles BTC_USDT_Perp -i 1h --count 5000 -o json | jq 'length'    # 5000
+```
+
+### Candlestick Response Fields
+
+| Field | Description |
+|-------|-------------|
+| `open_time` | Bar open time (nanosecond timestamp) |
+| `close_time` | Bar close time (nanosecond timestamp) |
+| `open` | Open price |
+| `high` | High price |
+| `low` | Low price |
+| `close` | Close price |
+| `volume_b` | Volume in base currency |
+| `volume_q` | Volume in quote currency (USDT) |
+| `trades` | Number of trades in the bar |
+
+In `-o json`, results are an array sorted ascending by `open_time`. In `-o table`, the columns are `time` (human-readable), `open`, `high`, `low`, `close`, `volume`.
+
 ## Funding Rates
 
 ### Current Funding Rate
