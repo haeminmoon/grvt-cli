@@ -17,6 +17,8 @@ grvt-cli market instruments -o json
 ```bash
 # By kind
 grvt-cli market instruments --kind PERPETUAL -o json
+grvt-cli market instruments --kind spot -o json     # spot pairs (USDC_USDT_SpotSwap)
+grvt-cli market instruments --kind all -o json      # perp + spot together
 grvt-cli market instruments --kind FUTURE -o json
 
 # By base currency
@@ -27,7 +29,7 @@ grvt-cli market instruments --base ETH -o json
 grvt-cli market instruments --base SOL --kind PERPETUAL -o json
 ```
 
-Valid kinds: `PERPETUAL`, `FUTURE`, `CALL`, `PUT`
+Valid kinds: `PERPETUAL`, `SPOT_SWAP` (spot), `FUTURE`, `CALL`, `PUT`. Aliases: `perp`, `spot`, `all` (perp+spot). Spot pairs are named `{BASE}_{QUOTE}_SpotSwap`; the default `instruments` view is perp-only, so use `--kind spot`/`all` to see spot.
 
 ### Instrument Response Fields
 

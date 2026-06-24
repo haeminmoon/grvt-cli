@@ -38,4 +38,25 @@ export function registerAccountTools(server: McpServer): void {
       return mcpText(JSON.stringify(response.result, null, 2));
     }),
   );
+
+  server.tool(
+    'get_spot_account_summary',
+    'Get spot wallet balances for a sub-account. Spot is a separate wallet from the perp/funding account; returns total equity and per-currency spot balances (currency, balance, available_to_transfer, unrealized_pnl).',
+    {
+      sub_account_id: z.string().optional().describe('Sub-account ID (uses configured default if not provided)'),
+    },
+    async (params) => withErrorHandling(async () => {
+      const auth = createAuthClient();
+      if ('error' in auth) return auth.error;
+      const { client, config } = auth;
+
+      const subAccountId = params.sub_account_id || config.subAccountId;
+      if (!subAccountId) {
+        return mcpError('Sub-account ID is not configured.');
+      }
+
+      const response = await client.getSpotAccountSummary({ sub_account_id: subAccountId });
+      return mcpText(JSON.stringify(response.result, null, 2));
+    }),
+  );
 }

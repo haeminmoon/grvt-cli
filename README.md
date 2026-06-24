@@ -1,6 +1,6 @@
 # @2oolkit/grvt-cli
 
-Trade perpetual futures on [GRVT](https://grvt.io) — a hybrid decentralized derivatives exchange on ZKsync — from your terminal or AI agent.
+Trade perpetual futures **and spot** on [GRVT](https://grvt.io) — a hybrid decentralized derivatives exchange on ZKsync — from your terminal or AI agent.
 
 **One package, three interfaces:**
 
@@ -10,7 +10,7 @@ Trade perpetual futures on [GRVT](https://grvt.io) — a hybrid decentralized de
 | **MCP Server**     | `grvt-mcp`                         | AI agents (Claude, Cursor, Windsurf, etc.) |
 | **OpenClaw Skill** | [`skill/SKILL.md`](skill/SKILL.md) | AI agent ecosystem (OpenClaw, ClawdBot)    |
 
-90+ perpetual instruments: crypto (BTC, ETH, SOL), equities (TSLA, AMZN), commodities (XAU, XAG).
+90+ perpetual instruments: crypto (BTC, ETH, SOL), equities (TSLA, AMZN), commodities (XAU, XAG). **Spot trading** is also supported (e.g. `USDC_USDT_SpotSwap`) — same order/orderbook/candle/fill APIs, with a separate spot wallet (`account spot`).
 
 ## Installation
 
@@ -82,8 +82,10 @@ export GRVT_SUB_ACCOUNT_ID=<your-sub-account-id>
 #### Market Data (no auth required)
 
 ```bash
-grvt-cli market instruments                        # List all instruments
-grvt-cli market instruments --kind PERPETUAL       # Filter by kind
+grvt-cli market instruments                        # List perpetual instruments
+grvt-cli market instruments --kind spot            # Spot pairs (e.g. USDC_USDT_SpotSwap)
+grvt-cli market instruments --kind all             # Perp + spot together
+grvt-cli market instruments --kind PERPETUAL       # Filter by kind (perp/spot/future/call/put)
 grvt-cli market instruments --base BTC             # Filter by base currency
 grvt-cli market ticker BTC_USDT_Perp               # Price, volume, funding
 grvt-cli market orderbook BTC_USDT_Perp            # Orderbook (10 levels)
@@ -150,6 +152,7 @@ grvt-cli position list --kind PERPETUAL            # Filter by kind
 
 grvt-cli account summary                           # Funding account
 grvt-cli account sub-account                       # Sub-account (margin, balance)
+grvt-cli account spot                              # Spot wallet balances (separate from perp)
 
 grvt-cli funding rate BTC_USDT_Perp                # Current funding rate
 grvt-cli funding history --limit 10                # Payment history
@@ -216,14 +219,14 @@ Or without global install:
 }
 ```
 
-### Available Tools (18)
+### Available Tools (19)
 
 | Category        | Tools                                                                                                     | Auth Required |
 | --------------- | --------------------------------------------------------------------------------------------------------- | ------------- |
 | **Market Data** | `get_instruments`, `get_ticker`, `get_orderbook`, `get_candlesticks`                                      | No            |
 | **Orders**      | `create_order`, `cancel_order`, `cancel_all_orders`, `get_order`, `list_open_orders`, `get_order_history` | Yes           |
 | **Positions**   | `list_positions`                                                                                          | Yes           |
-| **Account**     | `get_account_summary`, `get_sub_account_summary`                                                          | Yes           |
+| **Account**     | `get_account_summary`, `get_sub_account_summary`, `get_spot_account_summary`                              | Yes           |
 | **Funding**     | `get_funding_rate`, `get_funding_payment_history`                                                         | Mixed         |
 | **Auth**        | `auth_login`, `auth_status`, `auth_logout`                                                                | No            |
 
@@ -261,8 +264,11 @@ Instruments follow `{BASE}_{QUOTE}_{Type}`:
 | `SOL_USDT_Perp`  | Solana perpetual       |
 | `TSLA_USDT_Perp` | Tesla equity perpetual |
 | `XAU_USDT_Perp`  | Gold perpetual         |
+| `USDC_USDT_SpotSwap` | USDC/USDT **spot** |
 
-Use `grvt-cli market instruments -o json` for the full list with tick sizes and minimum order sizes.
+Perp instruments end in `_Perp`; **spot pairs end in `_SpotSwap`**. Spot uses the same order/orderbook/candle/fill commands — just pass the `_SpotSwap` instrument (e.g. `grvt-cli order create --instrument USDC_USDT_SpotSwap ...`). Positions and funding are perp-only. List spot with `grvt-cli market instruments --kind spot`.
+
+Use `grvt-cli market instruments --kind all -o json` for the full list (perp + spot) with tick sizes and minimum order sizes.
 
 ## Common Workflows
 

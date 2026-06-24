@@ -45,7 +45,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@grvt/client": "^1.6.5",
+    "@grvt/client": "^1.8.2",
     "@grvt/sdk": "^0.0.4",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "commander": "^13.1.0",

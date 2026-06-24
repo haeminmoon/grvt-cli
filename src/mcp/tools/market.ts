@@ -22,7 +22,7 @@ export function registerMarketTools(server: McpServer): void {
     'get_instruments',
     'List available trading instruments on GRVT. Returns instrument names, tick sizes, minimum order sizes, and other specs. Use this before placing orders to verify instrument existence and constraints.',
     {
-      kind: z.enum(['PERPETUAL', 'FUTURE', 'CALL', 'PUT']).optional().describe('Filter by instrument kind'),
+      kind: z.enum(['PERPETUAL', 'SPOT_SWAP', 'FUTURE', 'CALL', 'PUT']).optional().describe('Filter by instrument kind (SPOT_SWAP = spot pairs, e.g. USDC_USDT_SpotSwap)'),
       base: z.string().optional().describe('Filter by base currency (e.g., BTC, ETH, SOL)'),
       quote: z.string().optional().describe('Filter by quote currency (e.g., USDT)'),
     },

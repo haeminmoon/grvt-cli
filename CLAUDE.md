@@ -12,7 +12,7 @@ One npm package (`@2oolkit/grvt-cli`), three interfaces:
 | MCP Server | `grvt-mcp` | AI agents (Claude, Cursor, Windsurf) via Model Context Protocol |
 | OpenClaw Skill | `skill/SKILL.md` | AI agent skill ecosystems (OpenClaw, ClawdBot) |
 
-90+ perpetual instruments: crypto (BTC, ETH, SOL), equities (TSLA, AMZN), commodities (XAU, XAG).
+90+ perpetual instruments: crypto (BTC, ETH, SOL), equities (TSLA, AMZN), commodities (XAU, XAG). **Spot** trading is also supported (instruments named `{BASE}_{QUOTE}_SpotSwap`, e.g. `USDC_USDT_SpotSwap`).
 
 ## Tech Stack
 
@@ -50,6 +50,7 @@ src/
 - **File permissions:** Config dir `0700`, config/session files `0600`.
 - **CSPRNG nonces:** Order signing uses `crypto.randomInt()`, NOT the SDK's `Math.random()`.
 - **No withdrawal features:** By design, for security.
+- **Spot support:** Requires `@grvt/client >= 1.8.x` (`EKind.SPOT_SWAP` + `tdgClient.spotAccountSummary`). Spot reuses the perp endpoints (Create Order, Cancel, Orderbook, Candles, Fill History) — just pass a `_SpotSwap` instrument. `all_instruments` defaults to PERPETUAL only, so spot is fetched via the filtered `instruments({kind:[SPOT_SWAP]})` or `getAllInstruments({kinds:[...]})`. Spot wallet balances come from `account spot` (`getSpotAccountSummary`), separate from the perp/funding wallet. Positions & Funding Payment History do **not** apply to spot.
 - **Output:** Table (human default) + JSON (`-o json` for agents/scripts). Errors go to stderr.
 - **Auth flow:** API key login → session cookie stored locally → auto-refresh on expiry.
 - **EIP-712 signing:** Orders are signed client-side with the user's private key (apiSecret). The key never leaves the machine.

@@ -87,4 +87,51 @@ export function registerAccountCommands(program: Command): void {
         handleError(err);
       }
     });
+
+  accountCmd
+    .command('spot')
+    .description('Get spot wallet balances (spot is a separate wallet from perp/funding)')
+    .option('--id <subAccountId>', 'Sub-account ID (overrides default)')
+    .option('-o, --output <format>', 'Output format (json, table)', 'table')
+    .action(async (options) => {
+      try {
+        const { client, subAccountId } = withAuth({ subAccountId: options.id });
+
+        const response = await client.getSpotAccountSummary({
+          sub_account_id: subAccountId,
+        });
+
+        const format = getOutputFormat(options);
+        if (format === 'json') {
+          output(response.result, format);
+          return;
+        }
+
+        const summary = response.result;
+        if (!summary) {
+          process.stdout.write('No spot account data\n');
+          return;
+        }
+
+        output({
+          subAccountId: summary.sub_account_id || subAccountId,
+          totalEquity: formatNumber(summary.total_equity, 2),
+        }, format);
+
+        const balances = summary.spot_balances || [];
+        if (balances.length > 0) {
+          process.stdout.write('\n  Spot Balances:\n');
+          for (const b of balances) {
+            process.stdout.write(
+              `    ${(b.currency || '').padEnd(8)} ${formatNumber(b.balance, 4).padStart(16)}` +
+              `   (가용 ${formatNumber(b.available_to_transfer, 4)}, uPnL ${formatNumber(b.unrealized_pnl, 2)})\n`
+            );
+          }
+        } else {
+          process.stdout.write('\n  (no spot balances)\n');
+        }
+      } catch (err) {
+        handleError(err);
+      }
+    });
 }

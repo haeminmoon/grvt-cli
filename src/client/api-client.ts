@@ -40,6 +40,8 @@ import {
   IApiFillHistoryResponse,
   IApiMiniTickerRequest,
   IApiMiniTickerResponse,
+  IApiSpotSubAccountSummaryRequest,
+  IApiSpotSubAccountSummaryResponse,
 } from '@grvt/client/interfaces';
 import { CliConfig, SessionData } from '../config/store';
 import { ActionableError } from '../output/error';
@@ -229,6 +231,14 @@ export class CliApiClient extends GrvtClient {
   override async getFundingAccountSummary(): Promise<IApiFundingAccountSummaryResponse> {
     const config = await this.authConfig();
     return this.tdgClient.fundingAccountSummary(config);
+  }
+
+  /** Spot wallet balances for a sub-account (spot is a separate wallet from perp/funding). */
+  async getSpotAccountSummary(
+    request: IApiSpotSubAccountSummaryRequest
+  ): Promise<IApiSpotSubAccountSummaryResponse> {
+    const config = await this.authConfig();
+    return this.tdgClient.spotAccountSummary(request, config);
   }
 
   async getFundingPaymentHistory(

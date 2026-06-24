@@ -150,8 +150,10 @@ These commands work without login. Use them for price checks, instrument discove
 
 | Command | Description |
 |---------|-------------|
-| `grvt-cli market instruments` | List all available instruments |
-| `grvt-cli market instruments --kind PERPETUAL` | Filter by kind (PERPETUAL, FUTURE, CALL, PUT) |
+| `grvt-cli market instruments` | List perpetual instruments |
+| `grvt-cli market instruments --kind spot` | List spot pairs (e.g. USDC_USDT_SpotSwap) |
+| `grvt-cli market instruments --kind all` | List perp + spot together |
+| `grvt-cli market instruments --kind PERPETUAL` | Filter by kind (perp/spot/future/call/put) |
 | `grvt-cli market instruments --base BTC` | Filter by base currency |
 | `grvt-cli market instruments --base ETH --kind PERPETUAL` | Combine filters |
 | `grvt-cli market ticker <instrument>` | Price, volume, funding rate, open interest |
@@ -217,6 +219,7 @@ All trading commands require a valid session. Run `grvt-cli auth login` first.
 |---------|-------------|
 | `grvt-cli account summary` | Funding account (total equity, spot balances) |
 | `grvt-cli account sub-account` | Sub-account (margin, available balance, unrealized PnL) |
+| `grvt-cli account spot` | Spot wallet balances (separate from perp; per-currency balance/uPnL) |
 
 ### Funding Rates
 

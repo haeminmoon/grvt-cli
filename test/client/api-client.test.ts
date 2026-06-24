@@ -74,6 +74,15 @@ describe('CliApiClient', () => {
         client.cancelOrder({ sub_account_id: 'test', order_id: '123' })
       ).rejects.toThrow(ActionableError);
     });
+
+    it('throws ActionableError for getSpotAccountSummary without auth', async () => {
+      const client = new CliApiClient({
+        env: EGrvtEnvironment.TESTNET,
+      });
+      await expect(
+        client.getSpotAccountSummary({ sub_account_id: 'test' })
+      ).rejects.toThrow(ActionableError);
+    });
   });
 
   describe('market data methods (no auth required)', () => {

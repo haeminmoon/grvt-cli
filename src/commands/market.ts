@@ -28,7 +28,7 @@ export function registerMarketCommands(program: Command): void {
   marketCmd
     .command('instruments')
     .description('List available instruments')
-    .option('--kind <kind>', 'Filter by kind (PERPETUAL, FUTURE, CALL, PUT)')
+    .option('--kind <kind>', 'Filter by kind: perp/PERPETUAL, spot/SPOT_SWAP, FUTURE, CALL, PUT, or all (perp+spot)')
     .option('--base <currency>', 'Filter by base currency (e.g., BTC, ETH)')
     .option('--quote <currency>', 'Filter by quote currency (e.g., USDT)')
     .option('-o, --output <format>', 'Output format (json, table)', 'table')
@@ -37,9 +37,18 @@ export function registerMarketCommands(program: Command): void {
         const config = getEffectiveConfig();
         const client = new CliApiClient(config);
 
+        const KIND_ALIAS: Record<string, EKind> = {
+          PERP: EKind.PERPETUAL, PERPETUAL: EKind.PERPETUAL,
+          SPOT: EKind.SPOT_SWAP, SPOTSWAP: EKind.SPOT_SWAP, SPOT_SWAP: EKind.SPOT_SWAP,
+          FUTURE: EKind.FUTURE, CALL: EKind.CALL, PUT: EKind.PUT,
+        };
+        const kindArg = options.kind ? String(options.kind).toUpperCase() : '';
+
         const request: IApiGetFilteredInstrumentsRequest = {};
-        if (options.kind) {
-          request.kind = [options.kind.toUpperCase() as EKind];
+        if (kindArg && kindArg !== 'ALL') {
+          const k = KIND_ALIAS[kindArg];
+          if (!k) throw new Error(`Unknown kind "${options.kind}". Use: perp, spot, future, call, put, all.`);
+          request.kind = [k];
         }
         if (options.base) {
           request.base = [options.base.toUpperCase()];
@@ -48,9 +57,13 @@ export function registerMarketCommands(program: Command): void {
           request.quote = [options.quote.toUpperCase()];
         }
 
-        const response = options.kind || options.base || options.quote
-          ? await client.getInstruments(request)
-          : await client.getAllInstruments({});
+        // all_instruments defaults to PERPETUAL only; pass kinds to include spot.
+        const response =
+          kindArg === 'ALL'
+            ? await client.getAllInstruments({ kinds: [EKind.PERPETUAL, EKind.SPOT_SWAP] })
+            : request.kind || request.base || request.quote
+              ? await client.getInstruments(request)
+              : await client.getAllInstruments({});
 
         const format = getOutputFormat(options);
         const instruments = response.result || [];
